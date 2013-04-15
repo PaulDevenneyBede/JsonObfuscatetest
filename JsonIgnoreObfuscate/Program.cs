@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using JsonIgnoreObfuscate.Filters;
+using JsonIgnoreObfuscate.Json;
+using JsonIgnoreObfuscate.Maskers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +12,12 @@ namespace JsonIgnoreObfuscate
 {
     class Program
     {
+        private static readonly Dictionary<Type, object> registeredFilters = new Dictionary<Type, object>();
+
         static void Main(string[] args)
         {
-            var creditCardMasker = new Masker(){ Pattern = "************####", Size = 16};
-            var passwordMasker = new Masker() { Pattern = "****************", Size = 16 };
+            IMasker creditCardMasker = new DefaultMasker(){ Pattern = "************####", Size = 16};
+            IMasker passwordMasker = new DefaultMasker() { Pattern = "****************", Size = 16 };
 
             var cc1 = creditCardMasker.Mask("1234567890123456");
             var cc2 = creditCardMasker.Mask("123456789012345");
@@ -36,8 +41,8 @@ namespace JsonIgnoreObfuscate
                     .Obfuscate(f => f.Password, passwordMasker)
                     .Obfuscate(f => f.CardNumber, creditCardMasker);
 
-            Add(filter);
-            Add(filter2);
+            RegisterFilter(filter);
+            RegisterFilter(filter2);
 
             var resolver = new IgnoreObfuscateContractResolver<MyTestClass>(filter);
             var settings = new JsonSerializerSettings {ContractResolver = resolver};
@@ -46,10 +51,9 @@ namespace JsonIgnoreObfuscate
             Console.ReadKey();
         }
 
-        private static void Add<T>(ILogFilter<T> filter)
+        private static void RegisterFilter<T>(ILogFilter<T> filter)
         {
-            var coll = new Dictionary<Type, object>();
-            coll.Add(typeof (T), filter);
+            registeredFilters.Add(typeof (T), filter);
         }
     }
 }

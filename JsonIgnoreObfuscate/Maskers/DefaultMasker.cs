@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
-namespace JsonIgnoreObfuscate
+namespace JsonIgnoreObfuscate.Maskers
 {
-    public class Masker
+    public class DefaultMasker : IMasker
     {
         public int Size { get; set; }
         public char Padder { get; set; }

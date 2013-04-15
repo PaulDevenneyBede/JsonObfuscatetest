@@ -1,44 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using JsonIgnoreObfuscate.Filters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
-namespace JsonIgnoreObfuscate
+namespace JsonIgnoreObfuscate.Json
 {
-    public class ObfuscateProvider : IValueProvider
-    {
-        private readonly Masker _masker;
-        private readonly IValueProvider _underlyingValueProvider;
-
-        public ObfuscateProvider(MemberInfo memberInfo, Masker masker)
-        {
-            _underlyingValueProvider = new DynamicValueProvider(memberInfo);
-            _masker = masker;
-        }
-
-        public object GetValue(object target)
-        {
-            return _masker.Mask(_underlyingValueProvider.GetValue(target).ToString());
-        }
-
-        public void SetValue(object target, object value)
-        {
-            _underlyingValueProvider.SetValue(target, value);
-        }
-
-    }
-
-
     public class IgnoreObfuscateContractResolver<T> : DefaultContractResolver
     {
         private readonly ILogFilter<T> _logfilter;
-
-        //public new static readonly IgnoreObfuscateContractResolver<T> Instance = new IgnoreObfuscateContractResolver<T>(new LogFilter<T>());
 
         public IgnoreObfuscateContractResolver(ILogFilter<T> logfilter)
         {
@@ -82,6 +54,4 @@ namespace JsonIgnoreObfuscate
                              "propertyRefExpr");
         }
     }
-
-
 }
